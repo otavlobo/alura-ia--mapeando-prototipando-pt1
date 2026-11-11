@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraFlow — Organizador de Rotinas</title>
+
+  <!-- Google Fonts: Inter e Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons (CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Estilos da aplicação -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Elementos Tridimensionais Flutuantes de Fundo -->
+  <div class="bg-3d-scene" aria-hidden="true">
+    <div class="shape-3d shape-torus"></div>
+    <div class="shape-3d shape-cube"></div>
+    <div class="shape-3d shape-sphere"></div>
+    <div class="shape-3d shape-cone"></div>
+    <div class="shape-3d shape-pyramid"></div>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- Cabeçalho -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-3d">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div>
+          <h1 class="title">AuraFlow</h1>
+          <p class="subtitle">Gestão Dinâmica de Rotinas & Hábitos</p>
+        </div>
+      </div>
+
+      <div class="user-badge">
+        <i data-lucide="user-check"></i>
+        <span>Auxiliar Administrativo @ <strong>Coagru</strong></span>
+      </div>
+    </header>
+
+    <!-- Filtros por Categoria -->
+    <nav class="categories-nav">
+      <button class="filter-btn active" data-category="all">
+        <i data-lucide="layers"></i> Todas
+      </button>
+      <button class="filter-btn" data-category="trabalho">
+        <i data-lucide="briefcase"></i> Trabalho
+      </button>
+      <button class="filter-btn" data-category="esportes">
+        <i data-lucide="trophy"></i> Esportes
+      </button>
+      <button class="filter-btn" data-category="saude">
+        <i data-lucide="heart-pulse"></i> Saúde
+      </button>
+      <button class="filter-btn" data-category="estudo">
+        <i data-lucide="book-open"></i> Estudo
+      </button>
+      <button class="filter-btn" data-category="lazer">
+        <i data-lucide="smile"></i> Lazer
+      </button>
+      <button class="filter-btn" data-category="hobby">
+        <i data-lucide="gamepad-2"></i> Hobby
+      </button>
+    </nav>
+
+    <!-- Grid de Cards da Rotina -->
+    <main class="routine-grid" id="routineGrid">
+      <!-- Inserido dinamicamente via JS -->
+    </main>
+
+  </div>
+
+  <!-- Modal de Detalhes -->
+  <div class="modal-overlay" id="routineModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeModalBtn" aria-label="Fechar Modal">
+        <i data-lucide="x"></i>
+      </button>
+
+      <div class="modal-header">
+        <span class="category-badge" id="modalCategory">Categoria</span>
+        <h2 id="modalTitle">Título da Rotina</h2>
+        <div class="modal-time-info">
+          <i data-lucide="clock"></i>
+          <span id="modalTime">00:00 - 00:00</span>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-block">
+          <h3><i data-lucide="align-left"></i> Descrição</h3>
+          <p id="modalDescription">Descrição detalhada...</p>
+        </div>
+
+        <div class="info-block">
+          <h3><i data-lucide="check-square"></i> Lista de Tarefas / Checkpoints</h3>
+          <ul class="task-checklist" id="modalChecklist">
+            <!-- Checkpoints inseridos dinamicamente -->
+          </ul>
+        </div>
+
+        <div class="info-block meta-block">
+          <div>
+            <span class="meta-label">Frequência:</span>
+            <strong id="modalFrequency">Diário</strong>
+          </div>
+          <div>
+            <span class="meta-label">Prioridade:</span>
+            <strong id="modalPriority">Alta</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-action" id="actionBtn">
+          <i data-lucide="check-circle-2"></i> Marcar como Concluída
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dados da Rotina Personalizados
+    const routinesData = [
+      {
+        id: "1",
+        title: "Treino de Alta Performance",
+        category: "esportes",
+        time: "06:15 - 07:30",
+        shortDesc: "Sessão matinal de corrida e musculação focada em resistência.",
+        fullDesc: "Treinamento físico para manter o condicionamento em alta e preparar o corpo para as partidas no fim de semana. Foco em estabilização, força e ganho cardiorrespiratório.",
+        checklist: [
+          "Aquecimento articular dinâmico (10 min)",
+          "Corrida intervalada ou treino de hipertrofia",
+          "Alongamento e hidratação (500ml de água)"
+        ],
+        frequency: "Seg, Quar, Sex",
+        priority: "Alta",
+        icon: "trophy",
+        tagColor: "var(--color-sports)"
+      },
+      {
+        id: "2",
+        title: "Triagem de Notas e Lançamentos",
+        category: "trabalho",
+        time: "08:00 - 10:00",
+        shortDesc: "Organização documental e atualização dos sistemas Coagru.",
+        fullDesc: "Rotina administrativa prioritária na Coagru. Envolve recebimento, conferência e organização de notas fiscais, relatórios operacionais e preenchimento das planilhas de controle interno.",
+        checklist: [
+          "Verificar caixa de entrada de e-mails corporativos",
+          "Conferir física e digitalmente as notas de entrada",
+          "Alimentar sistema ERP com relatórios diários"
+        ],
+        frequency: "Segunda a Sexta",
+        priority: "Alta",
+        icon: "file-text",
+        tagColor: "var(--color-work)"
+      },
+      {
+        id: "3",
+        title: "Atendimento & Fluxo de Processos",
+        category: "trabalho",
+        time: "10:15 - 12:00",
+        shortDesc: "Acompanhamento de requisições e suporte administrativo.",
+        fullDesc: "Processamento de solicitações de setores internos, atendimento aos cooperados/clientes e organização de arquivos físicos e digitais na unidade Coagru.",
+        checklist: [
+          "Atender chamados e solicitações prioritárias",
+          "Arquivar documentos validados no drive central",
+          "Organizar malote para envio/recebimento"
+        ],
+        frequency: "Segunda a Sexta",
+        priority: "Média",
+        icon: "briefcase",
+        tagColor: "var(--color-work)"
+      },
+      {
+        id: "4",
+        title: "Alimentação Balanceada & Descanso",
+        category: "saude",
+        time: "12:00 - 13:30",
+        shortDesc: "Nutrição estratégica e desconexão completa para recarga.",
+        fullDesc: "Pausa essencial para manter a energia física e mental alta durante a tarde. Refeição equilibrada rica em proteínas e vegetais, seguida de momento de relaxamento.",
+        checklist: [
+          "Refeição completa (Proteínas + Carboidratos complexos)",
+          "Ingestão de 600ml de água",
+          "15 a 20 minutos de repouso longe de telas"
+        ],
+        frequency: "Diário",
+        priority: "Alta",
+        icon: "heart-pulse",
+        tagColor: "var(--color-health)"
+      },
+      {
+        id: "5",
+        title: "Especialização em Gestão e Excel",
+        category: "estudo",
+        time: "18:30 - 19:40",
+        shortDesc: "Aprimoramento em ferramentas corporativas e processos.",
+        fullDesc: "Sessão focada em aperfeiçoamento de habilidades analíticas, automação em planilhas Excel avançadas e gestão de processos administrativos.",
+        checklist: [
+          "Assistir 1 aula teórica da plataforma de cursos",
+          "Praticar criação de dashboards e fórmulas",
+          "Anotar resumos no Notion/Caderno"
+        ],
+        frequency: "Ter, Quinta",
+        priority: "Média",
+        icon: "book-open",
+        tagColor: "var(--color-study)"
+      },
+      {
+        id: "6",
+        title: "Futebol / Esporte Coletivo",
+        category: "hobby",
+        time: "20:00 - 21:30",
+        shortDesc: "Partida com os amigos para relaxar e praticar esporte em grupo.",
+        fullDesc: "Momento chave de descompressão da semana. Prática esportiva coletiva unindo hobby, integração social, diversão e queima calórica.",
+        checklist: [
+          "Separar equipamentos e garrafa de água",
+          "Realizar aquecimento pré-jogo",
+          "Confraternização rápida e desaquecimento"
+        ],
+        frequency: "Toda Quarta e Sábado",
+        priority: "Média",
+        icon: "gamepad-2",
+        tagColor: "var(--color-hobby)"
+      },
+      {
+        id: "7",
+        title: "Desconexão Digital e Leitura",
+        category: "lazer",
+        time: "22:00 - 22:45",
+        shortDesc: "Sessão de relaxamento sem telas antes do sono repousante.",
+        fullDesc: "Rotina noturna para garantir um sono reparador. Redução da luz azul, leitura de ficção ou desenvolvimento pessoal e preparação do ambiente.",
+        checklist: [
+          "Ativar modo noturno nos aparelhos eletrônicos",
+          "Ler 15 a 20 páginas de um livro físico",
+          "Ajustar o ambiente para escuridão total"
+        ],
+        frequency: "Diário",
+        priority: "Baixa",
+        icon: "smile",
+        tagColor: "var(--color-leisure)"
+      }
+    ];
+
+    // Elementos DOM
+    const routineGrid = document.getElementById('routineGrid');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const modal = document.getElementById('routineModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    // Renderizar Cards
+    function renderRoutines(categoryFilter = 'all') {
+      routineGrid.innerHTML = '';
+      
+      const filtered = categoryFilter === 'all' 
+        ? routinesData 
+        : routinesData.filter(item => item.category === categoryFilter);
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'routine-card';
+        card.setAttribute('data-id', item.id);
+
+        card.innerHTML = `
+          <div class="card-glow"></div>
+          <div class="card-top">
+            <span class="card-category" style="background: ${item.tagColor}22; color: ${item.tagColor}; border: 1px solid ${item.tagColor}44;">
+              <i data-lucide="${item.icon}"></i> ${item.category.toUpperCase()}
+            </span>
+            <span class="card-time"><i data-lucide="clock"></i> ${item.time}</span>
+          </div>
+          <h3 class="card-title">${item.title}</h3>
+          <p class="card-desc">${item.shortDesc}</p>
+          <div class="card-footer">
+            <span class="view-more">Detalhes do Bloco <i data-lucide="arrow-right"></i></span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openModal(item));
+        routineGrid.appendChild(card);
+      });
+
+      // Recarregar ícones da biblioteca Lucide
+      lucide.createIcons();
+    }
+
+    // Filtragem por categoria
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderRoutines(btn.getAttribute('data-category'));
+      });
+    });
+
+    // Abrir Modal
+    function openModal(data) {
+      document.getElementById('modalCategory').textContent = data.category.toUpperCase();
+      document.getElementById('modalCategory').style.background = `${data.tagColor}33`;
+      document.getElementById('modalCategory').style.color = data.tagColor;
+      document.getElementById('modalCategory').style.border = `1px solid ${data.tagColor}66`;
+
+      document.getElementById('modalTitle').textContent = data.title;
+      document.getElementById('modalTime').textContent = data.time;
+      document.getElementById('modalDescription').textContent = data.fullDesc;
+      document.getElementById('modalFrequency').textContent = data.frequency;
+      document.getElementById('modalPriority').textContent = data.priority;
+
+      const checklistContainer = document.getElementById('modalChecklist');
+      checklistContainer.innerHTML = '';
+      data.checklist.forEach(task => {
+        const li = document.createElement('li');
+        li.innerHTML = `<i data-lucide="check-circle"></i> <span>${task}</span>`;
+        checklistContainer.appendChild(li);
+      });
+
+      modal.classList.add('active');
+      lucide.createIcons();
+    }
+
+    // Fechar Modal
+    function closeModal() {
+      modal.classList.remove('active');
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Fechar modal com tecla ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // Botão de ação do modal (Efeito Interativo)
+    document.getElementById('actionBtn').addEventListener('click', function() {
+      this.classList.toggle('completed');
+      if (this.classList.contains('completed')) {
+        this.innerHTML = `<i data-lucide="check"></i> Concluído com Sucesso!`;
+        this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+      } else {
+        this.innerHTML = `<i data-lucide="check-circle-2"></i> Marcar como Concluída`;
+        this.style.background = '';
+      }
+      lucide.createIcons();
+    });
+
+    // Inicialização
+    renderRoutines();
+  </script>
+</body>
+</html>
